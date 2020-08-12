@@ -11,7 +11,39 @@ class Book:
         print("You entered " + book.title + " by " +  book.author)
 
 
-    books = [] #array to hold all books user inputs
+    booksArray = [] #array to hold all books user inputs
+
+import sqlite3
+from sqlite3 import Error
+
+
+def create_connection(db_file):
+    """ create a database connection to a SQLite database """
+    conn = None
+    try:
+        conn = sqlite3.connect(db_file)
+        print("Opened database successfully")
+        print(sqlite3.version) #printed 2.6.0
+        conn.execute('''CREATE TABLE BOOKS
+                 (ID INT PRIMARY KEY     NOT NULL,
+                 TITLE          TEXT    NOT NULL,
+                 AUTHOR         TEXT    NOT NULL,
+                 GENRE          TEXT    NOT NULL,
+                 KEYWORDS       TEXT   );''')
+        print ("Table created successfully")
+
+        conn.close()
+    except Error as e:
+        print(e)
+    finally:
+        if conn:
+            conn.close()
+
+
+if __name__ == '__main__':  #created connection to dbase in this directory
+    create_connection(r"C:Users\kathryntempas\Desktop\Python\library\pythonsqlite.db")
+
+
 
 def main():
 
@@ -66,9 +98,18 @@ def add():
             keywords.append(keyword)
 
     newBook=Book(title, author, genre, keywords) #make a book object w/user input
-    Book.books.append(newBook)  #append the new book to the books array in the class Book
+    Book.booksArray.append(newBook)  #append the new book to the books array in the class Book
     print('You added ' + newBook.title + ' by ' + newBook.author + ' which  is ' + newBook.genre  +
           ' and has these keywords ' + str(newBook.keywords))
+    #adding newBook to dbase
+    conn = sqlite3.connect('test.db')
+    print ("Opened database successfully")
+
+    conn.execute("INSERT INTO BOOKS (ID,TITLE,AUTHOR,GENRE,KEYWORDS) \
+         VALUES (1, title, author, genre, keywords )");
+    conn.commit()
+    print ("Records created successfully")
+    conn.close()
 
 def delete():
     title = input("Enter the title of the book you want to delete")
